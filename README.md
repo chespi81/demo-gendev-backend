@@ -1,29 +1,61 @@
-# README #
+# Demo GenDev Backend
 
-This README would normally document whatever steps are necessary to get your application up and running.
+A Java application scaffold for backend development demonstrations.
 
-### What is this repository for? ###
+## Project Overview
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+* A simple Java application built with Gradle
+* Uses Java 21
+* Demonstrates basic project structure with a "Hello World" functionality
+* Part of the POC Colombia project for Scotia Tech
 
-### How do I get set up? ###
+## Setup and Configuration
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+### Requirements
 
-### Contribution guidelines ###
+* JDK 21
+* Gradle 9.0.0 or compatible (wrapper included)
 
-* Writing tests
-* Code review
-* Other guidelines
+### Dependencies
 
-### Who do I talk to? ###
+* Google Guava (33.4.6-jre) - A set of core Java libraries
+* JUnit (4.13.2) - For unit testing
 
-* Repo owner or admin
-* Other community or team contact
+### Building and Running
+
+To build the project:
+
+```bash
+./gradlew build
+```
+
+To run the application:
+
+```bash
+./gradlew run
+```
+
+The application will output "Hello World!" to the console when executed.
+
+### Running Tests
+
+Execute the test suite with:
+
+```bash
+./gradlew test
+```
+
+## Project Structure
+
+* `app/src/main/java/org/example/App.java` - Main application entry point
+* `app/src/test/java/org/example/AppTest.java` - Unit tests
+* `gradle/libs.versions.toml` - Dependency version management
+
+## Development
+
+This project uses Gradle's configuration cache for better build performance. The project is configured to use the Foojay Resolver Convention for automatic JDK management.
+
+## Contact
+
+* Project maintained by Scotia Tech team
+* For support, contact the POC Colombia project team
