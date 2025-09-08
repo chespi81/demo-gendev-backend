@@ -3,6 +3,7 @@ package org.example.controller;
 import org.example.model.CreditCard;
 import org.example.model.Transaction;
 import org.example.service.CreditCardService;
+import org.example.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +20,12 @@ import java.util.List;
 public class CreditCardController {
 
     private final CreditCardService creditCardService;
+    private final TransactionService transactionService;
 
     @Autowired
-    public CreditCardController(CreditCardService creditCardService) {
+    public CreditCardController(CreditCardService creditCardService, TransactionService transactionService) {
         this.creditCardService = creditCardService;
+        this.transactionService = transactionService;
     }
 
     /**
@@ -99,7 +102,7 @@ public class CreditCardController {
      */
     @GetMapping("/{cardId}/transactions")
     public ResponseEntity<List<Transaction>> getTransactionsByCardId(@PathVariable Long cardId) {
-        List<Transaction> transactions = creditCardService.getTransactionsByCardId(cardId);
+        List<Transaction> transactions = transactionService.getTransactionsByCreditCardId(cardId);
         if (transactions.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -120,7 +123,7 @@ public class CreditCardController {
             @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate,
             @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
         
-        List<Transaction> transactions = creditCardService.getTransactionsByCardIdAndDateRange(
+        List<Transaction> transactions = transactionService.getTransactionsByCreditCardIdAndDateRange(
                 cardId, startDate, endDate);
         
         if (transactions.isEmpty()) {
@@ -141,7 +144,7 @@ public class CreditCardController {
             @PathVariable Long cardId,
             @PathVariable String type) {
         
-        List<Transaction> transactions = creditCardService.getTransactionsByCardIdAndType(cardId, type);
+        List<Transaction> transactions = transactionService.getTransactionsByCreditCardIdAndType(cardId, type);
         
         if (transactions.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -161,7 +164,7 @@ public class CreditCardController {
             @PathVariable Long cardId,
             @RequestBody Transaction transaction) {
         
-        return creditCardService.addTransaction(cardId, transaction)
+        return transactionService.saveTransaction(transaction, cardId)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

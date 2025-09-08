@@ -97,7 +97,9 @@ public class TransactionService {
         if (creditCardOptional.isPresent()) {
             CreditCard creditCard = creditCardOptional.get();
             transaction.setCreditCard(creditCard);
-            return Optional.of(transactionRepository.save(transaction));
+            creditCard.addTransaction(transaction);
+            creditCardRepository.save(creditCard);
+            return Optional.of(transaction);
         }
         
         return Optional.empty();
