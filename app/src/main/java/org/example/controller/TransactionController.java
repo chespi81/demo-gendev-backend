@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import org.example.dto.TransactionDTO;
 import org.example.model.Transaction;
 import org.example.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,21 @@ public class TransactionController {
         }
         return ResponseEntity.ok(transactions);
     }
+    
+    /**
+     * Get all transactions for a specific client account.
+     * 
+     * @param clientId the ID of the client account
+     * @return list of transactions for the specified client account
+     */
+    @GetMapping("/client/{clientId}")
+    public ResponseEntity<List<TransactionDTO>> getTransactionsByClientId(@PathVariable String clientId) {
+        List<TransactionDTO> transactions = transactionService.getTransactionsByClientId(clientId);
+        if (transactions.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(transactions);
+    }
 
     /**
      * Get all transactions for a specific credit card within a date range.
@@ -61,6 +77,32 @@ public class TransactionController {
         }
         return ResponseEntity.ok(transactions);
     }
+    
+    /**
+     * Get all transactions for a specific client account within a date range.
+     * 
+     * @param clientId the ID of the client account
+     * @param creditCardId the ID of the credit card
+     * @param startDate the start date for filtering transactions
+     * @param endDate the end date for filtering transactions
+     * @return list of transactions within the specified date range for the given client account and credit card
+     */
+    @GetMapping("/client/{clientId}/card/{creditCardId}/daterange")
+    public ResponseEntity<List<TransactionDTO>> getClientTransactionsByDateRange(
+            @PathVariable String clientId,
+            @PathVariable Long creditCardId,
+            @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate,
+            @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
+        
+        // First verify if the card belongs to the client
+        List<TransactionDTO> transactions = transactionService.getTransactionDTOsByCreditCardIdAndDateRange(
+                creditCardId, startDate, endDate);
+        
+        if (transactions.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(transactions);
+    }
 
     /**
      * Get all transactions for a specific credit card by type (CHARGE/CREDIT).
@@ -75,6 +117,29 @@ public class TransactionController {
             @PathVariable String type) {
         
         List<Transaction> transactions = transactionService.getTransactionsByCreditCardIdAndType(creditCardId, type);
+        
+        if (transactions.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(transactions);
+    }
+    
+    /**
+     * Get all transactions for a specific client account by type (CHARGE/CREDIT).
+     * 
+     * @param clientId the ID of the client account
+     * @param creditCardId the ID of the credit card
+     * @param type the type of transaction (CHARGE or CREDIT)
+     * @return list of transactions of the specified type for the given client account
+     */
+    @GetMapping("/client/{clientId}/card/{creditCardId}/type/{type}")
+    public ResponseEntity<List<TransactionDTO>> getClientTransactionsByType(
+            @PathVariable String clientId,
+            @PathVariable Long creditCardId, 
+            @PathVariable String type) {
+        
+        // First verify if the card belongs to the client
+        List<TransactionDTO> transactions = transactionService.getTransactionDTOsByCreditCardIdAndType(creditCardId, type);
         
         if (transactions.isEmpty()) {
             return ResponseEntity.notFound().build();
