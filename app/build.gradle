@@ -6,8 +6,14 @@
  */
 
 plugins {
-    // Apply the application plugin to add support for building a CLI application in Java.
+    // Apply the Java plugin
+    id 'java'
+    
+    // Apply the application plugin to handle execution
     id 'application'
+    
+    // Apply the Spring Boot plugin to enable bootRun task
+    id 'org.springframework.boot' version '3.2.5'
 }
 
 repositories {
@@ -16,21 +22,41 @@ repositories {
 }
 
 dependencies {
-    // Use JUnit test framework.
-    testImplementation libs.junit
-
+    // Spring Boot dependencies
+    implementation 'org.springframework.boot:spring-boot-starter:3.2.5'
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.2.5'
+    
+    // Testing dependencies
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.2.5'
+    testImplementation 'junit:junit:4.13.2'
+    
     // This dependency is used by the application.
-    implementation libs.guava
+    implementation 'com.google.guava:guava:33.4.6-jre'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(17) // Using Java 17 for better compatibility with Spring Boot 3.x
     }
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
 }
 
 application {
-    // Define the main class for the application.
     mainClass = 'org.example.App'
+}
+
+// Create a task to package as a fat/uber JAR
+jar {
+    manifest {
+        attributes 'Main-Class': 'org.example.App'
+    }
+    
+    // Include all dependencies in the jar
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

@@ -1,12 +1,12 @@
 # Demo GenDev Backend
 
-A Java application scaffold for backend development demonstrations.
+A Spring Boot RESTful API backend for development demonstrations.
 
 ## Project Overview
 
-* A simple Java application built with Gradle
+* A Spring Boot application built with Gradle
 * Uses Java 21
-* Demonstrates basic project structure with a "Hello World" functionality
+* Implements a REST API with CRUD operations
 * Part of the POC Colombia project for Scotia Tech
 
 ## Setup and Configuration
@@ -18,8 +18,10 @@ A Java application scaffold for backend development demonstrations.
 
 ### Dependencies
 
+* Spring Boot Starter (3.2.5) - Core Spring Boot functionality
+* Spring Boot Starter Web (3.2.5) - Web application support with embedded Tomcat
+* Spring Boot Starter Test (3.2.5) - Testing support for Spring Boot applications
 * Google Guava (33.4.6-jre) - A set of core Java libraries
-* JUnit (4.13.2) - For unit testing
 
 ### Building and Running
 
@@ -32,10 +34,10 @@ To build the project:
 To run the application:
 
 ```bash
-./gradlew run
+./gradlew bootRun
 ```
 
-The application will output "Hello World!" to the console when executed.
+The application will start a Spring Boot server on port 8080.
 
 ### Running Tests
 
@@ -47,13 +49,27 @@ Execute the test suite with:
 
 ## Project Structure
 
-* `app/src/main/java/org/example/App.java` - Main application entry point
+* `app/src/main/java/org/example/App.java` - Spring Boot application entry point
+* `app/src/main/java/org/example/controller/` - REST controllers
+* `app/src/main/java/org/example/model/` - Data models
+* `app/src/main/resources/application.properties` - Spring Boot configuration
 * `app/src/test/java/org/example/AppTest.java` - Unit tests
 * `gradle/libs.versions.toml` - Dependency version management
 
 ## Development
 
 This project uses Gradle's configuration cache for better build performance. The project is configured to use the Foojay Resolver Convention for automatic JDK management.
+
+## API Endpoints
+
+The following REST endpoints are available:
+
+* `GET /api/hello` - Returns a simple greeting message
+* `GET /api/messages` - Returns all messages
+* `GET /api/messages/{id}` - Returns a specific message by ID
+* `POST /api/messages` - Creates a new message
+* `PUT /api/messages/{id}` - Updates an existing message
+* `DELETE /api/messages/{id}` - Deletes a message
 
 ## Contact
 
