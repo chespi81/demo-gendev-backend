@@ -1,10 +1,13 @@
 package org.example.service;
 
 import org.example.model.CreditCard;
+import org.example.model.Transaction;
 import org.example.repository.CreditCardRepository;
+import org.example.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,10 +15,12 @@ import java.util.Optional;
 public class CreditCardService {
 
     private final CreditCardRepository creditCardRepository;
+    private final TransactionRepository transactionRepository;
 
     @Autowired
-    public CreditCardService(CreditCardRepository creditCardRepository) {
+    public CreditCardService(CreditCardRepository creditCardRepository, TransactionRepository transactionRepository) {
         this.creditCardRepository = creditCardRepository;
+        this.transactionRepository = transactionRepository;
     }
 
     /**
@@ -75,5 +80,59 @@ public class CreditCardService {
         }
         creditCardRepository.deleteById(id);
         return true;
+    }
+    
+    /**
+     * Get all transactions for a specific credit card.
+     *
+     * @param cardId the ID of the credit card
+     * @return list of transactions for the specified credit card
+     */
+    public List<Transaction> getTransactionsByCardId(Long cardId) {
+        return transactionRepository.findByCreditCardId(cardId);
+    }
+    
+    /**
+     * Get all transactions for a specific credit card within a date range.
+     *
+     * @param cardId the ID of the credit card
+     * @param startDate the start date for filtering transactions
+     * @param endDate the end date for filtering transactions
+     * @return list of transactions within the specified date range for the given credit card
+     */
+    public List<Transaction> getTransactionsByCardIdAndDateRange(Long cardId, Date startDate, Date endDate) {
+        return transactionRepository.findByCreditCardIdAndTransactionDateBetween(cardId, startDate, endDate);
+    }
+    
+    /**
+     * Get all transactions of a specific type for a credit card.
+     *
+     * @param cardId the ID of the credit card
+     * @param type the type of transaction (CHARGE or CREDIT)
+     * @return list of transactions of the specified type for the given credit card
+     */
+    public List<Transaction> getTransactionsByCardIdAndType(Long cardId, String type) {
+        return transactionRepository.findByCreditCardIdAndType(cardId, type);
+    }
+    
+    /**
+     * Add a new transaction to a credit card.
+     *
+     * @param cardId the ID of the credit card
+     * @param transaction the transaction to add
+     * @return the added transaction if the card exists, or empty optional otherwise
+     */
+    public Optional<Transaction> addTransaction(Long cardId, Transaction transaction) {
+        Optional<CreditCard> creditCardOptional = creditCardRepository.findById(cardId);
+        
+        if (creditCardOptional.isPresent()) {
+            CreditCard creditCard = creditCardOptional.get();
+            transaction.setCreditCard(creditCard);
+            creditCard.addTransaction(transaction);
+            creditCardRepository.save(creditCard);
+            return Optional.of(transaction);
+        }
+        
+        return Optional.empty();
     }
 }

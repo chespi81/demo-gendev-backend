@@ -6,7 +6,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.FetchType;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Entity class representing a credit card.
@@ -41,6 +46,9 @@ public class CreditCard {
     
     @Column(nullable = false)
     private String ownerId; // ID number of the card owner
+    
+    @OneToMany(mappedBy = "creditCard", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Transaction> transactions = new ArrayList<>();
 
     // Default constructor
     public CreditCard() {
@@ -130,5 +138,23 @@ public class CreditCard {
 
     public void setOwnerId(String ownerId) {
         this.ownerId = ownerId;
+    }
+    
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
+    }
+    
+    public void addTransaction(Transaction transaction) {
+        transactions.add(transaction);
+        transaction.setCreditCard(this);
+    }
+    
+    public void removeTransaction(Transaction transaction) {
+        transactions.remove(transaction);
+        transaction.setCreditCard(null);
     }
 }
