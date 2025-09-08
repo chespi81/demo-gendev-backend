@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import org.example.dto.CreditCardDTO;
 import org.example.model.CreditCard;
 import org.example.model.Transaction;
 import org.example.service.CreditCardService;
@@ -30,28 +31,30 @@ public class CreditCardController {
 
     /**
      * Get all credit cards for a specific owner ID.
+     * This endpoint returns cards without their transactions.
      * 
      * @param ownerId the ID number of the card owner
-     * @return list of credit cards owned by the specified ID
+     * @return list of credit cards owned by the specified ID (without transactions)
      */
     @GetMapping("/owner/{ownerId}")
-    public ResponseEntity<List<CreditCard>> getCardsByOwnerId(@PathVariable String ownerId) {
-        List<CreditCard> cards = creditCardService.getCardsByOwnerId(ownerId);
-        if (cards.isEmpty()) {
+    public ResponseEntity<List<CreditCardDTO>> getCardsByOwnerId(@PathVariable String ownerId) {
+        List<CreditCardDTO> cardDTOs = creditCardService.getCardDTOsByOwnerId(ownerId);
+        if (cardDTOs.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(cards);
+        return ResponseEntity.ok(cardDTOs);
     }
 
     /**
      * Get a specific credit card by its ID.
+     * This endpoint returns a card without its transactions.
      * 
      * @param id the credit card ID
-     * @return the credit card if found
+     * @return the credit card if found (without transactions)
      */
     @GetMapping("/{id}")
-    public ResponseEntity<CreditCard> getCardById(@PathVariable Long id) {
-        return creditCardService.getCardById(id)
+    public ResponseEntity<CreditCardDTO> getCardById(@PathVariable Long id) {
+        return creditCardService.getCardDTOById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

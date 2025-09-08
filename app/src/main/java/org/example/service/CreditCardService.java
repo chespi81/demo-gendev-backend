@@ -1,5 +1,6 @@
 package org.example.service;
 
+import org.example.dto.CreditCardDTO;
 import org.example.model.CreditCard;
 import org.example.repository.CreditCardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CreditCardService {
@@ -75,5 +77,31 @@ public class CreditCardService {
         }
         creditCardRepository.deleteById(id);
         return true;
+    }
+    
+    /**
+     * Retrieve all credit card DTOs for a specific owner ID.
+     * This method doesn't include transactions.
+     *
+     * @param ownerId the ID number of the card owner
+     * @return list of credit card DTOs owned by the specified ID
+     */
+    public List<CreditCardDTO> getCardDTOsByOwnerId(String ownerId) {
+        return creditCardRepository.findByOwnerId(ownerId)
+                .stream()
+                .map(CreditCardDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get a specific credit card DTO by its ID.
+     * This method doesn't include transactions.
+     *
+     * @param id the credit card ID
+     * @return the credit card DTO if found, or empty optional otherwise
+     */
+    public Optional<CreditCardDTO> getCardDTOById(Long id) {
+        return creditCardRepository.findById(id)
+                .map(CreditCardDTO::new);
     }
 }
