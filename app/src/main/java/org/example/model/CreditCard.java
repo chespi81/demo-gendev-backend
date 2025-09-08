@@ -38,7 +38,7 @@ public class CreditCard {
     @Column(nullable = false)
     private boolean status; // On/Off
     
-    @Column(nullable = false, precision = 19, scale = 2)
+    @Column(nullable = false, precision = 19, scale = 2, name = "credit_limit")
     private BigDecimal limit; // Total amount that can be borrowed
     
     @Column(nullable = false, precision = 19, scale = 2)
