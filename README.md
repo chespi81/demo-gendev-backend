@@ -14,7 +14,7 @@ A Spring Boot RESTful API backend for development demonstrations.
 ### Requirements
 
 * JDK 21
-* Gradle 9.0.0 or compatible (wrapper included)
+* Gradle 8.7 or compatible (wrapper included)
 
 ### Dependencies
 
