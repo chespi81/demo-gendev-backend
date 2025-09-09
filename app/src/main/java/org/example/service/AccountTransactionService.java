@@ -19,14 +19,13 @@ import java.util.stream.Collectors;
  * Service for account transaction operations.
  */
 @Service
-public class AccountTransactionService {
+public class AccountTransactionService extends BaseTransactionService<AccountTransaction, Account, AccountTransactionRepository> {
 
-    private final AccountTransactionRepository accountTransactionRepository;
     private final AccountRepository accountRepository;
 
     @Autowired
     public AccountTransactionService(AccountTransactionRepository accountTransactionRepository, AccountRepository accountRepository) {
-        this.accountTransactionRepository = accountTransactionRepository;
+        super(accountTransactionRepository);
         this.accountRepository = accountRepository;
     }
 
@@ -52,8 +51,9 @@ public class AccountTransactionService {
      * @param accountId the account ID
      * @return list of transactions for the specified account
      */
-    public List<AccountTransaction> getTransactionsByAccountId(Long accountId) {
-        return accountTransactionRepository.findByAccountId(accountId);
+    @Override
+    public List<AccountTransaction> getTransactionsByEntityId(Long accountId) {
+        return repository.findByAccountId(accountId);
     }
 
     /**
@@ -64,7 +64,7 @@ public class AccountTransactionService {
      * @return list of the last N transactions for the specified account
      */
     public List<AccountTransaction> getLastTransactionsByAccountId(Long accountId, int count) {
-        return accountTransactionRepository.findByAccountId(
+        return repository.findByAccountId(
             accountId, 
             PageRequest.of(0, count, Sort.by(Sort.Direction.DESC, "transactionDate"))
         );
@@ -78,8 +78,9 @@ public class AccountTransactionService {
      * @param endDate end date for the date range
      * @return list of transactions for the specified account within the date range
      */
-    public List<AccountTransaction> getTransactionsByAccountIdAndDateRange(Long accountId, Date startDate, Date endDate) {
-        return accountTransactionRepository.findByAccountIdAndTransactionDateBetween(accountId, startDate, endDate);
+    @Override
+    public List<AccountTransaction> getTransactionsByEntityIdAndDateRange(Long accountId, Date startDate, Date endDate) {
+        return repository.findByAccountIdAndTransactionDateBetween(accountId, startDate, endDate);
     }
 
     /**
@@ -89,18 +90,24 @@ public class AccountTransactionService {
      * @param type the transaction type (e.g., CHARGE or CREDIT)
      * @return list of transactions for the specified account and type
      */
-    public List<AccountTransaction> getTransactionsByAccountIdAndType(Long accountId, String type) {
-        return accountTransactionRepository.findByAccountIdAndType(accountId, type);
+    @Override
+    public List<AccountTransaction> getTransactionsByEntityIdAndType(Long accountId, String type) {
+        return repository.findByAccountIdAndType(accountId, type);
     }
 
     /**
-     * Get a transaction by its ID.
-     *
-     * @param id the transaction ID
-     * @return optional containing the transaction if found
+     * For compatibility with existing API
      */
-    public Optional<AccountTransaction> getTransactionById(Long id) {
-        return accountTransactionRepository.findById(id);
+    public List<AccountTransaction> getTransactionsByAccountId(Long accountId) {
+        return getTransactionsByEntityId(accountId);
+    }
+
+    public List<AccountTransaction> getTransactionsByAccountIdAndDateRange(Long accountId, Date startDate, Date endDate) {
+        return getTransactionsByEntityIdAndDateRange(accountId, startDate, endDate);
+    }
+
+    public List<AccountTransaction> getTransactionsByAccountIdAndType(Long accountId, String type) {
+        return getTransactionsByEntityIdAndType(accountId, type);
     }
 
     /**
@@ -110,6 +117,7 @@ public class AccountTransactionService {
      * @param accountId the ID of the account for this transaction
      * @return optional containing the saved transaction if successful
      */
+    @Override
     public Optional<AccountTransaction> saveTransaction(AccountTransaction transaction, Long accountId) {
         Optional<Account> accountOpt = accountRepository.findById(accountId);
         
@@ -125,16 +133,13 @@ public class AccountTransactionService {
 
     /**
      * Delete a transaction by its ID.
+     * Delegating to parent method.
      *
      * @param id the ID of the transaction to delete
      * @return true if deleted successfully, false otherwise
      */
     public boolean deleteTransaction(Long id) {
-        if (accountTransactionRepository.existsById(id)) {
-            accountTransactionRepository.deleteById(id);
-            return true;
-        }
-        return false;
+        return delete(id);
     }
 
     /**
@@ -144,7 +149,7 @@ public class AccountTransactionService {
      * @return list of transaction DTOs for the specified account
      */
     public List<AccountTransactionDTO> getTransactionDTOsByAccountId(Long accountId) {
-        return accountTransactionRepository.findByAccountId(accountId).stream()
+        return repository.findByAccountId(accountId).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -157,7 +162,7 @@ public class AccountTransactionService {
      * @return list of the last N transaction DTOs for the specified account
      */
     public List<AccountTransactionDTO> getLastTransactionDTOsByAccountId(Long accountId, int count) {
-        return accountTransactionRepository.findByAccountId(
+        return repository.findByAccountId(
                 accountId,
                 PageRequest.of(0, count, Sort.by(Sort.Direction.DESC, "transactionDate"))
             )
@@ -175,7 +180,7 @@ public class AccountTransactionService {
      * @return list of transaction DTOs for the specified account within the date range
      */
     public List<AccountTransactionDTO> getTransactionDTOsByAccountIdAndDateRange(Long accountId, Date startDate, Date endDate) {
-        return accountTransactionRepository.findByAccountIdAndTransactionDateBetween(accountId, startDate, endDate).stream()
+        return repository.findByAccountIdAndTransactionDateBetween(accountId, startDate, endDate).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -188,7 +193,7 @@ public class AccountTransactionService {
      * @return list of transaction DTOs for the specified account and type
      */
     public List<AccountTransactionDTO> getTransactionDTOsByAccountIdAndType(Long accountId, String type) {
-        return accountTransactionRepository.findByAccountIdAndType(accountId, type).stream()
+        return repository.findByAccountIdAndType(accountId, type).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }

@@ -16,14 +16,13 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/accounts")
-public class AccountController {
+public class AccountController extends BaseController<Account, Long, AccountService> {
 
-    private final AccountService accountService;
     private final AccountTransactionService accountTransactionService;
 
     @Autowired
     public AccountController(AccountService accountService, AccountTransactionService accountTransactionService) {
-        this.accountService = accountService;
+        super(accountService);
         this.accountTransactionService = accountTransactionService;
     }
 
@@ -35,63 +34,20 @@ public class AccountController {
      */
     @GetMapping("/owner/{ownerId}")
     public ResponseEntity<List<Account>> getAccountsByOwnerId(@PathVariable String ownerId) {
-        List<Account> accounts = accountService.getAccountsByOwnerId(ownerId);
+        List<Account> accounts = service.getAccountsByOwnerId(ownerId);
         if (accounts.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(accounts);
     }
 
-    /**
-     * Get a specific account by its ID.
-     * 
-     * @param id the account ID
-     * @return the account if found
-     */
-    @GetMapping("/{id}")
-    public ResponseEntity<Account> getAccountById(@PathVariable Long id) {
-        return accountService.getAccountById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    @Override
+    public ResponseEntity<List<Account>> getByOwnerId(String ownerId) {
+        return getAccountsByOwnerId(ownerId);
     }
 
-    /**
-     * Create a new account.
-     * 
-     * @param account the account to create
-     * @return the created account
-     */
-    @PostMapping
-    public ResponseEntity<Account> createAccount(@RequestBody Account account) {
-        Account savedAccount = accountService.saveAccount(account);
-        return ResponseEntity.ok(savedAccount);
-    }
-
-    /**
-     * Update an existing account.
-     * 
-     * @param id the ID of the account to update
-     * @param updatedAccount the updated account details
-     * @return the updated account if found
-     */
-    @PutMapping("/{id}")
-    public ResponseEntity<Account> updateAccount(@PathVariable Long id, @RequestBody Account updatedAccount) {
-        return accountService.updateAccount(id, updatedAccount)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    /**
-     * Delete an account by its ID.
-     * 
-     * @param id the ID of the account to delete
-     * @return no content if deleted, not found if the account was not found
-     */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAccount(@PathVariable Long id) {
-        boolean deleted = accountService.deleteAccount(id);
-        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
-    }
+    // The following methods are inherited from BaseController:
+    // getById, create, update, delete
     
     /**
      * Get all transactions for an account.

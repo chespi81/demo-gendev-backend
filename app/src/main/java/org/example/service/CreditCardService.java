@@ -11,13 +11,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class CreditCardService {
-
-    private final CreditCardRepository creditCardRepository;
+public class CreditCardService extends GenericServiceImpl<CreditCard, Long, CreditCardRepository> {
 
     @Autowired
     public CreditCardService(CreditCardRepository creditCardRepository) {
-        this.creditCardRepository = creditCardRepository;
+        super(creditCardRepository);
     }
 
     /**
@@ -27,56 +25,52 @@ public class CreditCardService {
      * @return list of credit cards owned by the specified ID
      */
     public List<CreditCard> getCardsByOwnerId(String ownerId) {
-        return creditCardRepository.findByOwnerId(ownerId);
+        return repository.findByOwnerId(ownerId);
     }
 
     /**
      * Get a specific credit card by its ID.
+     * Delegating to the parent method for backward compatibility.
      *
      * @param id the credit card ID
      * @return the credit card if found, or empty optional otherwise
      */
     public Optional<CreditCard> getCardById(Long id) {
-        return creditCardRepository.findById(id);
+        return getById(id);
     }
 
     /**
      * Save a new credit card.
+     * Delegating to the parent method for backward compatibility.
      *
      * @param creditCard the credit card to save
      * @return the saved credit card
      */
     public CreditCard saveCard(CreditCard creditCard) {
-        return creditCardRepository.save(creditCard);
+        return save(creditCard);
     }
 
     /**
      * Update an existing credit card.
+     * Delegating to the parent method for backward compatibility.
      *
      * @param id the ID of the credit card to update
      * @param updatedCard the updated credit card details
      * @return the updated credit card if found, or empty optional otherwise
      */
     public Optional<CreditCard> updateCard(Long id, CreditCard updatedCard) {
-        if (!creditCardRepository.existsById(id)) {
-            return Optional.empty();
-        }
-        updatedCard.setId(id);
-        return Optional.of(creditCardRepository.save(updatedCard));
+        return update(id, updatedCard);
     }
 
     /**
      * Delete a credit card by its ID.
+     * Delegating to the parent method for backward compatibility.
      *
      * @param id the ID of the credit card to delete
      * @return true if deleted, false if the card was not found
      */
     public boolean deleteCard(Long id) {
-        if (!creditCardRepository.existsById(id)) {
-            return false;
-        }
-        creditCardRepository.deleteById(id);
-        return true;
+        return delete(id);
     }
     
     /**
@@ -87,7 +81,7 @@ public class CreditCardService {
      * @return list of credit card DTOs owned by the specified ID
      */
     public List<CreditCardDTO> getCardDTOsByOwnerId(String ownerId) {
-        return creditCardRepository.findByOwnerId(ownerId)
+        return repository.findByOwnerId(ownerId)
                 .stream()
                 .map(CreditCardDTO::new)
                 .collect(Collectors.toList());
@@ -101,7 +95,7 @@ public class CreditCardService {
      * @return the credit card DTO if found, or empty optional otherwise
      */
     public Optional<CreditCardDTO> getCardDTOById(Long id) {
-        return creditCardRepository.findById(id)
+        return repository.findById(id)
                 .map(CreditCardDTO::new);
     }
 }

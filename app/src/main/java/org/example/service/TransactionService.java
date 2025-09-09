@@ -14,14 +14,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class TransactionService {
+public class TransactionService extends BaseTransactionService<Transaction, CreditCard, TransactionRepository> {
 
-    private final TransactionRepository transactionRepository;
     private final CreditCardRepository creditCardRepository;
 
     @Autowired
     public TransactionService(TransactionRepository transactionRepository, CreditCardRepository creditCardRepository) {
-        this.transactionRepository = transactionRepository;
+        super(transactionRepository);
         this.creditCardRepository = creditCardRepository;
     }
     
@@ -47,8 +46,9 @@ public class TransactionService {
      * @param creditCardId the ID of the credit card
      * @return list of transactions for the specified credit card, or empty list if none found
      */
-    public List<Transaction> getTransactionsByCreditCardId(Long creditCardId) {
-        return transactionRepository.findByCreditCardId(creditCardId);
+    @Override
+    public List<Transaction> getTransactionsByEntityId(Long creditCardId) {
+        return repository.findByCreditCardId(creditCardId);
     }
 
     /**
@@ -59,8 +59,9 @@ public class TransactionService {
      * @param endDate the end date for filtering transactions
      * @return list of transactions within the specified date range for the given credit card
      */
-    public List<Transaction> getTransactionsByCreditCardIdAndDateRange(Long creditCardId, Date startDate, Date endDate) {
-        return transactionRepository.findByCreditCardIdAndTransactionDateBetween(creditCardId, startDate, endDate);
+    @Override
+    public List<Transaction> getTransactionsByEntityIdAndDateRange(Long creditCardId, Date startDate, Date endDate) {
+        return repository.findByCreditCardIdAndTransactionDateBetween(creditCardId, startDate, endDate);
     }
 
     /**
@@ -70,18 +71,46 @@ public class TransactionService {
      * @param type the type of transaction (CHARGE or CREDIT)
      * @return list of transactions of the specified type for the given credit card
      */
-    public List<Transaction> getTransactionsByCreditCardIdAndType(Long creditCardId, String type) {
-        return transactionRepository.findByCreditCardIdAndType(creditCardId, type);
+    @Override
+    public List<Transaction> getTransactionsByEntityIdAndType(Long creditCardId, String type) {
+        return repository.findByCreditCardIdAndType(creditCardId, type);
     }
 
     /**
+     * For compatibility with existing API
+     */
+    public List<Transaction> getTransactionsByCreditCardId(Long creditCardId) {
+        return getTransactionsByEntityId(creditCardId);
+    }
+
+    public List<Transaction> getTransactionsByCreditCardIdAndDateRange(Long creditCardId, Date startDate, Date endDate) {
+        return getTransactionsByEntityIdAndDateRange(creditCardId, startDate, endDate);
+    }
+
+    public List<Transaction> getTransactionsByCreditCardIdAndType(Long creditCardId, String type) {
+        return getTransactionsByEntityIdAndType(creditCardId, type);
+    }
+    
+    /**
      * Get a specific transaction by its ID.
+     * Delegating to parent method for backward compatibility.
      *
      * @param id the transaction ID
      * @return the transaction if found, or empty optional otherwise
      */
     public Optional<Transaction> getTransactionById(Long id) {
-        return transactionRepository.findById(id);
+        return getById(id);
+    }
+    
+    /**
+     * Delete a transaction by its ID.
+     * Delegating to parent method for backward compatibility.
+     *
+     * @param id the ID of the transaction to delete
+     * @return true if deleted, false if the transaction was not found
+     */
+    public boolean deleteTransaction(Long id) {
+        return delete(id);
     }
 
     /**
@@ -91,6 +120,7 @@ public class TransactionService {
      * @param creditCardId the ID of the associated credit card
      * @return the saved transaction if the credit card exists, or empty optional otherwise
      */
+    @Override
     public Optional<Transaction> saveTransaction(Transaction transaction, Long creditCardId) {
         Optional<CreditCard> creditCardOptional = creditCardRepository.findById(creditCardId);
         
@@ -104,20 +134,6 @@ public class TransactionService {
         
         return Optional.empty();
     }
-
-    /**
-     * Delete a transaction by its ID.
-     *
-     * @param id the ID of the transaction to delete
-     * @return true if deleted, false if the transaction was not found
-     */
-    public boolean deleteTransaction(Long id) {
-        if (!transactionRepository.existsById(id)) {
-            return false;
-        }
-        transactionRepository.deleteById(id);
-        return true;
-    }
     
     /**
      * Retrieve all transactions for a specific client account as DTOs.
@@ -129,7 +145,7 @@ public class TransactionService {
         List<CreditCard> clientCards = creditCardRepository.findByOwnerId(clientId);
         
         return clientCards.stream()
-                .flatMap(card -> transactionRepository.findByCreditCardId(card.getId()).stream())
+                .flatMap(card -> repository.findByCreditCardId(card.getId()).stream())
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -141,7 +157,7 @@ public class TransactionService {
      * @return list of transaction DTOs for the specified credit card
      */
     public List<TransactionDTO> getTransactionDTOsByCreditCardId(Long creditCardId) {
-        return transactionRepository.findByCreditCardId(creditCardId).stream()
+        return repository.findByCreditCardId(creditCardId).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -155,7 +171,7 @@ public class TransactionService {
      * @return list of transaction DTOs within the specified date range for the given credit card
      */
     public List<TransactionDTO> getTransactionDTOsByCreditCardIdAndDateRange(Long creditCardId, Date startDate, Date endDate) {
-        return transactionRepository.findByCreditCardIdAndTransactionDateBetween(creditCardId, startDate, endDate).stream()
+        return repository.findByCreditCardIdAndTransactionDateBetween(creditCardId, startDate, endDate).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -168,7 +184,7 @@ public class TransactionService {
      * @return list of transaction DTOs of the specified type for the given credit card
      */
     public List<TransactionDTO> getTransactionDTOsByCreditCardIdAndType(Long creditCardId, String type) {
-        return transactionRepository.findByCreditCardIdAndType(creditCardId, type).stream()
+        return repository.findByCreditCardIdAndType(creditCardId, type).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }

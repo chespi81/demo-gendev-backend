@@ -18,14 +18,13 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/cards")
-public class CreditCardController {
+public class CreditCardController extends BaseController<CreditCard, Long, CreditCardService> {
 
-    private final CreditCardService creditCardService;
     private final TransactionService transactionService;
 
     @Autowired
     public CreditCardController(CreditCardService creditCardService, TransactionService transactionService) {
-        this.creditCardService = creditCardService;
+        super(creditCardService);
         this.transactionService = transactionService;
     }
 
@@ -38,64 +37,35 @@ public class CreditCardController {
      */
     @GetMapping("/owner/{ownerId}")
     public ResponseEntity<List<CreditCardDTO>> getCardsByOwnerId(@PathVariable String ownerId) {
-        List<CreditCardDTO> cardDTOs = creditCardService.getCardDTOsByOwnerId(ownerId);
+        List<CreditCardDTO> cardDTOs = service.getCardDTOsByOwnerId(ownerId);
         if (cardDTOs.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(cardDTOs);
     }
 
+    @Override
+    public ResponseEntity<List<CreditCardDTO>> getByOwnerId(String ownerId) {
+        return getCardsByOwnerId(ownerId);
+    }
+
     /**
-     * Get a specific credit card by its ID.
+     * Get a specific credit card by its ID (with DTO transformation).
      * This endpoint returns a card without its transactions.
+     * This method overrides the BaseController.getById to return a DTO instead of an entity.
      * 
      * @param id the credit card ID
-     * @return the credit card if found (without transactions)
+     * @return the credit card DTO if found (without transactions)
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<CreditCardDTO> getCardById(@PathVariable Long id) {
-        return creditCardService.getCardDTOById(id)
+    @GetMapping("/{id}/dto")
+    public ResponseEntity<CreditCardDTO> getCardDTOById(@PathVariable Long id) {
+        return service.getCardDTOById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    /**
-     * Create a new credit card.
-     * 
-     * @param creditCard the credit card to create
-     * @return the created credit card
-     */
-    @PostMapping
-    public ResponseEntity<CreditCard> createCard(@RequestBody CreditCard creditCard) {
-        CreditCard savedCard = creditCardService.saveCard(creditCard);
-        return ResponseEntity.ok(savedCard);
-    }
-
-    /**
-     * Update an existing credit card.
-     * 
-     * @param id the ID of the credit card to update
-     * @param updatedCard the updated credit card details
-     * @return the updated credit card if found
-     */
-    @PutMapping("/{id}")
-    public ResponseEntity<CreditCard> updateCard(@PathVariable Long id, @RequestBody CreditCard updatedCard) {
-        return creditCardService.updateCard(id, updatedCard)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    /**
-     * Delete a credit card by its ID.
-     * 
-     * @param id the ID of the credit card to delete
-     * @return no content if deleted, not found if the card was not found
-     */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCard(@PathVariable Long id) {
-        boolean deleted = creditCardService.deleteCard(id);
-        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
-    }
+    // The following methods are inherited from BaseController:
+    // getById (returns entity), create, update, delete
     
     /**
      * Get all transactions for a specific credit card.

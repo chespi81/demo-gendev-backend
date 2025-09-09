@@ -1,9 +1,6 @@
 package org.example.model;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import jakarta.persistence.OneToMany;
@@ -18,10 +15,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "credit_cards")
-public class CreditCard {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class CreditCard extends BaseEntity {
 
     @Column(nullable = false)
     private String lastFourDigits; // Obfuscated card number, only last 4 digits
@@ -68,13 +62,6 @@ public class CreditCard {
     }
 
     // Getters and setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getLastFourDigits() {
         return lastFourDigits;

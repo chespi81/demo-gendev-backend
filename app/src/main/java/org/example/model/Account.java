@@ -1,9 +1,6 @@
 package org.example.model;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import jakarta.persistence.OneToMany;
@@ -18,10 +15,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "accounts")
-public class Account {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Account extends BaseEntity {
 
     @Column(nullable = false, unique = true)
     private String accountNumber;
@@ -55,13 +49,6 @@ public class Account {
     }
 
     // Getters and setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getAccountNumber() {
         return accountNumber;
