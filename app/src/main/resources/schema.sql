@@ -5,6 +5,7 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS transactions;
+DROP TABLE IF EXISTS account_transactions;
 DROP TABLE IF EXISTS credit_cards;
 DROP TABLE IF EXISTS accounts;
 DROP TABLE IF EXISTS messages;
@@ -48,4 +49,14 @@ CREATE TABLE IF NOT EXISTS transactions (
     description VARCHAR(255) NOT NULL,
     type VARCHAR(255) NOT NULL,
     FOREIGN KEY (credit_card_id) REFERENCES credit_cards(id)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS account_transactions (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    amount DECIMAL(19,2) NOT NULL,
+    account_id BIGINT NOT NULL,
+    transaction_date DATETIME(6) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    type VARCHAR(255) NOT NULL,
+    FOREIGN KEY (account_id) REFERENCES accounts(id)
 ) ENGINE=InnoDB;

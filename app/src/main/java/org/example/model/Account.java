@@ -6,8 +6,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Entity class representing a bank account.
@@ -33,6 +37,9 @@ public class Account {
 
     @Column(nullable = false)
     private LocalDateTime creationDate;
+    
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AccountTransaction> transactions = new ArrayList<>();
 
     // Default constructor
     public Account() {
@@ -94,5 +101,23 @@ public class Account {
 
     public void setCreationDate(LocalDateTime creationDate) {
         this.creationDate = creationDate;
+    }
+    
+    public List<AccountTransaction> getTransactions() {
+        return transactions;
+    }
+    
+    public void setTransactions(List<AccountTransaction> transactions) {
+        this.transactions = transactions;
+    }
+    
+    public void addTransaction(AccountTransaction transaction) {
+        transactions.add(transaction);
+        transaction.setAccount(this);
+    }
+    
+    public void removeTransaction(AccountTransaction transaction) {
+        transactions.remove(transaction);
+        transaction.setAccount(null);
     }
 }
