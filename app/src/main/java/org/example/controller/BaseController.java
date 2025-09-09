@@ -1,5 +1,12 @@
 package org.example.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.example.model.BaseEntity;
 import org.example.service.BaseService;
 import org.springframework.http.ResponseEntity;
@@ -32,8 +39,18 @@ public abstract class BaseController<T extends BaseEntity, ID, S extends BaseSer
      * @param id the entity ID
      * @return the entity if found
      */
+    @Operation(
+        summary = "Get an entity by ID", 
+        description = "Returns a single entity based on its ID",
+        security = @SecurityRequirement(name = "bearer-key"))
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Entity found",
+                content = @Content(schema = @Schema(implementation = BaseEntity.class))),
+        @ApiResponse(responseCode = "404", description = "Entity not found", content = @Content)
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<T> getById(@PathVariable ID id) {
+    public ResponseEntity<T> getById(
+            @Parameter(description = "ID of the entity to retrieve") @PathVariable ID id) {
         return service.getById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -45,8 +62,17 @@ public abstract class BaseController<T extends BaseEntity, ID, S extends BaseSer
      * @param entity the entity to create
      * @return the created entity
      */
+    @Operation(
+        summary = "Create a new entity", 
+        description = "Creates a new entity and returns it with assigned ID",
+        security = @SecurityRequirement(name = "bearer-key"))
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Entity created successfully",
+                content = @Content(schema = @Schema(implementation = BaseEntity.class)))
+    })
     @PostMapping
-    public ResponseEntity<T> create(@RequestBody T entity) {
+    public ResponseEntity<T> create(
+            @Parameter(description = "Entity to create", required = true) @RequestBody T entity) {
         T savedEntity = service.save(entity);
         return ResponseEntity.ok(savedEntity);
     }
@@ -58,8 +84,19 @@ public abstract class BaseController<T extends BaseEntity, ID, S extends BaseSer
      * @param entity the updated entity details
      * @return the updated entity if found
      */
+    @Operation(
+        summary = "Update an entity", 
+        description = "Updates an existing entity based on ID",
+        security = @SecurityRequirement(name = "bearer-key"))
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Entity updated successfully",
+                content = @Content(schema = @Schema(implementation = BaseEntity.class))),
+        @ApiResponse(responseCode = "404", description = "Entity not found", content = @Content)
+    })
     @PutMapping("/{id}")
-    public ResponseEntity<T> update(@PathVariable ID id, @RequestBody T entity) {
+    public ResponseEntity<T> update(
+            @Parameter(description = "ID of the entity to update") @PathVariable ID id, 
+            @Parameter(description = "Updated entity information", required = true) @RequestBody T entity) {
         return service.update(id, entity)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -71,8 +108,17 @@ public abstract class BaseController<T extends BaseEntity, ID, S extends BaseSer
      * @param id the ID of the entity to delete
      * @return no content if deleted, not found if the entity was not found
      */
+    @Operation(
+        summary = "Delete an entity", 
+        description = "Deletes an entity based on ID",
+        security = @SecurityRequirement(name = "bearer-key"))
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Entity deleted successfully", content = @Content),
+        @ApiResponse(responseCode = "404", description = "Entity not found", content = @Content)
+    })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable ID id) {
+    public ResponseEntity<Void> delete(
+            @Parameter(description = "ID of the entity to delete") @PathVariable ID id) {
         boolean deleted = service.delete(id);
         return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
@@ -84,5 +130,14 @@ public abstract class BaseController<T extends BaseEntity, ID, S extends BaseSer
      * @param ownerId the owner ID
      * @return list of entities owned by the specified owner ID
      */
-    public abstract ResponseEntity<?> getByOwnerId(String ownerId);
+    @Operation(
+        summary = "Get entities by owner ID", 
+        description = "Returns all entities belonging to a specific owner",
+        security = @SecurityRequirement(name = "bearer-key"))
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Entities found"),
+        @ApiResponse(responseCode = "404", description = "No entities found for owner", content = @Content)
+    })
+    public abstract ResponseEntity<?> getByOwnerId(
+            @Parameter(description = "ID of the owner to retrieve entities for") String ownerId);
 }

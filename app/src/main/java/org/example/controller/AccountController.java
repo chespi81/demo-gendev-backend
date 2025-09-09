@@ -1,5 +1,14 @@
 package org.example.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.example.dto.AccountTransactionDTO;
 import org.example.model.Account;
 import org.example.model.AccountTransaction;
@@ -13,7 +22,10 @@ import java.util.List;
 
 /**
  * REST controller that provides endpoints for account operations.
+ * All endpoints require authentication.
  */
+@Tag(name = "Account", description = "Account management API")
+@SecurityRequirement(name = "bearer-key")
 @RestController
 @RequestMapping("/api/accounts")
 public class AccountController extends BaseController<Account, Long, AccountService> {
@@ -32,8 +44,15 @@ public class AccountController extends BaseController<Account, Long, AccountServ
      * @param ownerId the ID number of the account owner
      * @return list of accounts owned by the specified ID
      */
+    @Operation(summary = "Get accounts by owner ID", description = "Retrieves all accounts belonging to the specified owner")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accounts found", 
+                content = @Content(array = @ArraySchema(schema = @Schema(implementation = Account.class)))),
+        @ApiResponse(responseCode = "404", description = "No accounts found for owner", content = @Content)
+    })
     @GetMapping("/owner/{ownerId}")
-    public ResponseEntity<List<Account>> getAccountsByOwnerId(@PathVariable String ownerId) {
+    public ResponseEntity<List<Account>> getAccountsByOwnerId(
+            @Parameter(description = "ID of the owner") @PathVariable String ownerId) {
         List<Account> accounts = service.getAccountsByOwnerId(ownerId);
         if (accounts.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -55,8 +74,15 @@ public class AccountController extends BaseController<Account, Long, AccountServ
      * @param accountId the account ID
      * @return list of transactions for the specified account
      */
+    @Operation(summary = "Get account transactions", description = "Retrieves all transactions for a specific account")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Transactions found", 
+                content = @Content(array = @ArraySchema(schema = @Schema(implementation = AccountTransactionDTO.class)))),
+        @ApiResponse(responseCode = "404", description = "No transactions found for the account", content = @Content)
+    })
     @GetMapping("/{accountId}/transactions")
-    public ResponseEntity<List<AccountTransactionDTO>> getTransactionsByAccountId(@PathVariable Long accountId) {
+    public ResponseEntity<List<AccountTransactionDTO>> getTransactionsByAccountId(
+            @Parameter(description = "ID of the account") @PathVariable Long accountId) {
         List<AccountTransactionDTO> transactions = accountTransactionService.getTransactionDTOsByAccountId(accountId);
         if (transactions.isEmpty()) {
             return ResponseEntity.notFound().build();
