@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -14,6 +15,7 @@ import java.util.Date;
 @Table(name = "account_transactions")
 public class AccountTransaction extends BaseTransaction {
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "account_id", nullable = false)
     private Account account;
