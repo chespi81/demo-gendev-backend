@@ -39,6 +39,23 @@ To run the application:
 
 The application will start a Spring Boot server on port 8080.
 
+### Environment Variables
+
+The application uses environment variables for sensitive configuration. Set these before running the application:
+
+| Variable | Description | Default Value |
+|----------|-------------|---------------|
+| SPRING_DATASOURCE_URL | Database connection URL | jdbc:mysql://localhost:3306/demo_gendev?createDatabaseIfNotExist=true |
+| SPRING_DATASOURCE_USERNAME | Database username | root |
+| SPRING_DATASOURCE_PASSWORD | Database password | *No default - must be provided* |
+
+Example:
+
+```bash
+export SPRING_DATASOURCE_PASSWORD=your_secure_password
+./gradlew bootRun
+```
+
 ### Running Tests
 
 Execute the test suite with:
