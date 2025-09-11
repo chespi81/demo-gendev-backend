@@ -116,6 +116,30 @@ INSERT INTO account_transactions (transaction_date, amount, description, type, a
 ('2023-03-20 11:30:25', 800.00, 'Bonus Deposit', 'CREDIT', 2),
 ('2023-03-28 14:15:40', 350.25, 'Transfer to Savings', 'CHARGE', 2);
 
+-- Insert account transactions for account 3 (Jane's current account)
+INSERT INTO account_transactions (transaction_date, amount, description, type, account_id) VALUES
+('2023-02-01 09:15:20', 1200.00, 'Salary Deposit', 'CREDIT', 3),
+('2023-02-05 13:30:45', 180.00, 'ATM Withdrawal', 'CHARGE', 3),
+('2023-02-10 10:45:30', 95.50, 'Utility Bill Payment', 'CHARGE', 3),
+('2023-02-15 15:20:15', 250.00, 'Transfer to Savings', 'CHARGE', 3),
+('2023-02-20 11:30:00', 400.00, 'Client Deposit', 'CREDIT', 3),
+('2023-02-25 14:45:20', 135.75, 'Online Purchase', 'CHARGE', 3),
+('2023-03-01 10:20:30', 1500.00, 'Salary Deposit', 'CREDIT', 3),
+('2023-03-05 16:15:45', 300.00, 'ATM Withdrawal', 'CHARGE', 3),
+('2023-03-10 11:40:15', 105.50, 'Internet Bill', 'CHARGE', 3),
+('2023-03-15 14:25:30', 380.00, 'Transfer from Savings', 'CREDIT', 3);
+
+-- Insert account transactions for account 4 (Jane's demand account)
+INSERT INTO account_transactions (transaction_date, amount, description, type, account_id) VALUES
+('2023-02-03 10:20:15', 1500.00, 'Initial Deposit', 'CREDIT', 4),
+('2023-02-12 15:45:30', 280.00, 'ATM Withdrawal', 'CHARGE', 4),
+('2023-02-18 12:30:45', 650.00, 'Transfer Received', 'CREDIT', 4),
+('2023-02-24 16:15:20', 350.00, 'Transfer to Current', 'CHARGE', 4),
+('2023-03-03 11:40:10', 165.25, 'Online Purchase', 'CHARGE', 4),
+('2023-03-10 14:25:35', 700.00, 'Deposit', 'CREDIT', 4),
+('2023-03-17 17:50:45', 225.00, 'ATM Withdrawal', 'CHARGE', 4),
+('2023-03-24 12:35:15', 550.00, 'Transfer Received', 'CREDIT', 4);
+
 -- Insert account transactions for account 5 (Carlos's current account)
 INSERT INTO account_transactions (transaction_date, amount, description, type, account_id) VALUES
 ('2023-02-01 10:15:20', 1500.00, 'Salary Deposit', 'CREDIT', 5),
@@ -144,3 +168,13 @@ INSERT INTO account_transactions (transaction_date, amount, description, type, a
 ('2023-03-17 16:50:45', 250.00, 'ATM Withdrawal', 'CHARGE', 6),
 ('2023-03-24 11:35:15', 600.00, 'Transfer Received', 'CREDIT', 6),
 ('2023-03-31 14:20:30', 95.50, 'Subscription Payment', 'CHARGE', 6);
+
+-- Insert account transactions for account 7 (Carlos's second current account)
+INSERT INTO account_transactions (transaction_date, amount, description, type, account_id) VALUES
+('2023-03-01 11:15:20', 1000.00, 'Initial Deposit', 'CREDIT', 7),
+('2023-03-08 14:30:45', 150.00, 'ATM Withdrawal', 'CHARGE', 7),
+('2023-03-15 09:45:30', 65.75, 'Utility Bill Payment', 'CHARGE', 7),
+('2023-03-22 15:20:15', 200.00, 'Transfer to Primary', 'CHARGE', 7),
+('2023-03-29 10:35:00', 300.00, 'Client Deposit', 'CREDIT', 7),
+('2023-04-05 13:45:20', 120.50, 'Online Purchase', 'CHARGE', 7),
+('2023-04-12 09:30:30', 600.00, 'Deposit', 'CREDIT', 7);
